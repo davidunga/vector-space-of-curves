@@ -1,9 +1,5 @@
 
-var shapeScale = null;
-
-var betaChar = "\u03B2";
-var epsChar = "\u03B5";
-var phiChar = "\u03C6";
+var greek = {beta: "\u03B2", eps: "\u03B5", p:"\u03C6"};
 
 function update() {
     // compute shapes from parameters and redraw
@@ -11,12 +7,10 @@ function update() {
     let canvases = document.getElementsByTagName("canvas");
     huhShapes = [];
     for (let k = 1; k < canvases.length; k++) {
-        let m = parseInt(document.getElementById("m" + k).value);
-        let n = parseInt(document.getElementById("n" + k).value);
-        let eps = parseFloat(document.getElementById("eps" + k).value);
-        let p = parseFloat(document.getElementById("p" + k).value) / 180 * Math.PI;
-        let huh = new HuhShape(m, n, eps, p);
+
+        let huh = makeShapeFromInput(k);
         huhShapes.push(huh);
+
         drawPoints("canvas" + k, huh.curvePoints(), huh.logRadius());
 
         const canvas = document.getElementById("canvas" + k);
@@ -24,9 +18,9 @@ function update() {
 
         ctx.font = "16px Verdana";
         ctx.lineWidth = 1;
-        if (checkCoPrime(n, m)) {
+        if (checkCoPrime(huh.n, huh.m)) {
             ctx.fillStyle = 'black';
-            ctx.fillText(betaChar + "=" + Math.round(100 * huh.beta) / 100, 10, 20);
+            ctx.fillText(greek.beta + "=" + Math.round(100 * huh.beta) / 100, 10, 20);
         } else {
             ctx.fillStyle = 'red';
             ctx.fillText("m and n are not co-prime", 10, 20);
@@ -39,7 +33,15 @@ function update() {
     }
     let sumShape = addHuhShapes(huhShapes);
     drawPoints("canvas" + canvases.length, sumShape.curvePoints(), sumShape.logRadius());
-    console.log("SumShape:", sumShape);
+}
+
+function makeShapeFromInput(shapeIx) {
+    let m = parseInt(document.getElementById("m" + shapeIx).value);
+    let n = parseInt(document.getElementById("n" + shapeIx).value);
+    let eps = parseFloat(document.getElementById("eps" + shapeIx).value);
+    let p = parseFloat(document.getElementById("p" + shapeIx).value) / 180 * Math.PI;
+    let huh = new HuhShape(m, n, eps, p);
+    return huh;
 }
 
 function checkCoPrime(a, b) {
@@ -55,30 +57,20 @@ function checkCoPrime(a, b) {
     return true;
 }
 
-function transformPointsToCanvas(canvas, points) {
-    // scale and offset shape points to fit canvas.
-    // maintain consistency with other shapes.
+function transformPointsToCanvas_(canvas, points) {
+    // scale and offset shape points
 
-    if (shapeScale == null) {
-        let testShape = new HuhShape(3, 1, 1);
-        let testPoints = testShape.curvePoints();
-        let maxRad = 0;
-        for (let point of testPoints) {
-            let rad = point.x ** 2 + point.y ** 2;
-            if (rad > maxRad) {
-                maxRad = rad;
-            }
-        }
-        shapeScale = Math.sqrt(maxRad);
-    }
+    const targetScaleVsCanvas = .75;
 
-    let center = {x: canvas.width / 2, y: canvas.width / 2}
-    let scale = Math.min(canvas.width, canvas.height) / (8 * shapeScale);
-    for (let i = 0; i < points.length; i++) {
-        points[i].x = scale * points[i].x + center.x;
-        points[i].y = scale * points[i].y + center.y;
+    const maxX = Math.max.apply(null, points.map(pt => Math.abs(pt.x)));
+    const maxY = Math.max.apply(null, points.map(pt => Math.abs(pt.y)));
+    const scale = targetScaleVsCanvas * .5 * Math.min(canvas.width, canvas.height) / Math.max(maxX, maxY);
+
+    const center = {x: canvas.width / 2, y: canvas.width / 2};
+    for (let point of points) {
+        point.x = scale * point.x + center.x;
+        point.y = scale * point.y + center.y;
     }
-    return points;
 }
 
 function colormapBR(v) {
@@ -107,7 +99,7 @@ function drawPoints(canvasId, points, coloring) {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0,0, canvas.width, canvas.height);
 
-    points = transformPointsToCanvas(canvas, points);
+    transformPointsToCanvas_(canvas, points);
 
     ctx.lineWidth = 5;
     for (let i = 0; i < points.length - 1; i++) {
@@ -140,14 +132,7 @@ function makeParamInput(param, shapeIx, min, max, step, initVal, labelTxt) {
     // label:
     let lbl = document.createElement("label");
     lbl.for = inpt.id;
-    if (param === "p") {
-        labelTxt += " (" + phiChar + "):";
-    } else if (param === "eps") {
-        labelTxt += " (" + epsChar + "):";
-    } else {
-        labelTxt += " (" + param + "):";
-    }
-    lbl.innerHTML = labelTxt;
+    lbl.innerHTML = labelTxt + " (" + (param in greek ? greek[param] : param) + "):";
 
     // value display:
     let prg = document.createElement("p");
@@ -164,7 +149,7 @@ function makeParamInput(param, shapeIx, min, max, step, initVal, labelTxt) {
 
 function buildInterface() {
     const CANVAS_DIM = 350;
-    const INIT_SHAPE = [{m: 3, n: 1, eps: 2, p:0}, {m: 6, n: 7, eps: 1, p:0}];
+    const INIT_SHAPE = [{m: 5, n: 1, eps: 2, p:0}, {m: 5, n: 6, eps: 1.1, p:0}];
     const nShapes = INIT_SHAPE.length;
 
     for (let k = 0; k <= nShapes; k++) {
@@ -180,7 +165,7 @@ function buildInterface() {
 
         let prg = document.createElement("p");
         prg.style.width = "100%";
-        prg.innerHTML = k == nShapes ? "Shapes 1+2" : "Shape " + shapeIx;
+        prg.innerHTML = k == nShapes ? "Mix" : "Shape " + shapeIx;
         prg.style.fontWeight = "bold";
         prg.style.textAlign = "center";
         col.appendChild(prg);
