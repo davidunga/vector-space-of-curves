@@ -12,7 +12,7 @@ class HuhShape {
         /*
             m =     rotational symmetry (number of max-curvature points)
             n =     period size
-            eps =   amplitude
+            eps =   eccentricity
             p =     phase offset (relative to native phase)
 
             m & n must be co-prime integers.

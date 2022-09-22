@@ -177,7 +177,7 @@ function buildInterface() {
         let ul = document.createElement("ul");
         ul.appendChild(makeParamInput("m", shapeIx, 2, 10, 1, INIT_SHAPE[k].m, "Symmetry"));
         ul.appendChild(makeParamInput("n", shapeIx, 1, 10, 1, INIT_SHAPE[k].n, "Period"));
-        ul.appendChild(makeParamInput("eps", shapeIx, 0, 2, .1, INIT_SHAPE[k].eps, "Scale"));
+        ul.appendChild(makeParamInput("eps", shapeIx, 0, 2, .1, INIT_SHAPE[k].eps, "Eccentricity"));
         ul.appendChild(makeParamInput("p", shapeIx, -90, 90, 1, INIT_SHAPE[k].p, "Phase"));
         col.appendChild(ul);
     }

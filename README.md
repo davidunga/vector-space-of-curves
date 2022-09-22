@@ -23,7 +23,7 @@ Where:
 - r is the radius of curvature
 - &theta; is the winding angle tangent to the curve
 - m and n are co-prime integers, indexing the symmetry of the shape (m), and its periodicity relative to the winding angle (n).
-- &epsilon; and &phi; are scale and phase parameters.
+- &epsilon; and &phi; are eccentricity and phase parameters.
 
 &nbsp;
 ### References
