@@ -5,7 +5,7 @@
 
 **A visual interface for creating and mixing a special class of parameterized curves**, described by Dongsung Huh and Terrence J. Sejnowski. Under this parameterization, a linear sum of curves yields a visually intuitive mixture, preserving geometric features of the underlying shapes.
 
-[Click here to give it a go.](https://htmlpreview.github.io/?https://github.com/dudyu/vector-space-of-curves/blob/main/gui.html)
+[Click here to give it a go.](https://davidunga.github.io/vector-space-of-curves/)
 
 &nbsp;
 <img src="/doc/readme-resources/mixing.png" width="600px">
