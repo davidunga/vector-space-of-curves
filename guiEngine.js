@@ -127,6 +127,26 @@ function makeParamInput(param, shapeIx, min, max, step, initVal, labelTxt) {
     return li;
 }
 
+function makeMixInput(min, max, step, initVal, labelTxt) {
+    let inpt = document.createElement("input");
+    inpt.id = "mix_t";
+    inpt.type = "range";
+    inpt.min = min; inpt.step = step; inpt.value = initVal; inpt.max = max;
+    inpt.oninput = update;
+
+    let lbl = document.createElement("label");
+    lbl.htmlFor = inpt.id;
+    lbl.innerHTML = labelTxt + ":";
+
+    let prg = document.createElement("p");
+    prg.className = "val";
+    prg.id = "val_" + inpt.id;
+
+    let li = document.createElement("li");
+    li.appendChild(lbl); li.appendChild(inpt); li.appendChild(prg);
+    return li;
+}
+
 function buildInterface() {
     const CANVAS_DIM = 350;
     const INIT_SHAPE = [{m: 5, n: 1, eps: 2, p: 0}, {m: 5, n: 6, eps: 1.1, p: 0}];
@@ -149,39 +169,18 @@ function buildInterface() {
         prg.style.textAlign = "center";
         col.appendChild(prg);
 
+        let ul = document.createElement("ul");
+        
         if (k < nShapes) {
-            let ul = document.createElement("ul");
             ul.appendChild(makeParamInput("m",   shapeIx, 2,   10,  1,   INIT_SHAPE[k].m,   "Symmetry"));
             ul.appendChild(makeParamInput("n",   shapeIx, 1,   10,  1,   INIT_SHAPE[k].n,   "Period"));
             ul.appendChild(makeParamInput("eps", shapeIx, 0,   2,   .1,  INIT_SHAPE[k].eps, "Eccentricity"));
             ul.appendChild(makeParamInput("p",   shapeIx, -90, 90,  1,   INIT_SHAPE[k].p,   "Phase"));
             col.appendChild(ul);
         } else {
-            // ── single interpolation slider under Mix canvas ────────────
-            let ul = document.createElement("ul");
-
-            let inpt = document.createElement("input");
-            inpt.id = "mix_t";
-            inpt.type = "range";
-            inpt.min = 0; inpt.max = 1; inpt.step = 0.01; inpt.value = 0.5;
-            inpt.style.width = "270px";
-            inpt.oninput = update;
-
-            let lbl = document.createElement("label");
-            lbl.htmlFor = "mix_t";
-            lbl.innerHTML = "S1 \u2194 S2:";
-            lbl.style.width = "60px";
-
-            let val = document.createElement("p");
-            val.className = "val";
-            val.id = "val_mix_t";
-            val.style.width = "120px";
-
-            let li = document.createElement("li");
-            li.appendChild(lbl); li.appendChild(inpt); li.appendChild(val);
-            ul.appendChild(li);
+            ul.appendChild(makeMixInput(0, 1, 0.01, 0.5, "Mix Ratio"));
             col.appendChild(ul);
-            // ────────────────────────────────────────────────────────────
         }
+        
     }
 }
