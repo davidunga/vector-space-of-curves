@@ -30,7 +30,6 @@ function update() {
 
     let t = parseFloat(document.getElementById("mix_t").value);
     document.getElementById("val_mix_t2").innerHTML = Math.round(t * 100) + "%";
-    document.getElementById("val_mix_t1").innerHTML = Math.round((1 - t) * 100) + "%";
 
     let sumShape = addHuhShapesWeighted(huhShapes, [1 - t, t]);
     drawPoints("canvas" + canvases.length, sumShape.curvePoints(), sumShape.logRadius());
@@ -141,10 +140,6 @@ function makeMixInput(min, max, step, initVal, labelTxt) {
     let prg1 = document.createElement("p");
     prg1.className = "val";
     prg1.id = "val_mix_t1";
-    
-    let prg2 = document.createElement("p");
-    prg2.className = "val";
-    prg2.id = "val_mix_t2";
 
     let li = document.createElement("li");
     li.appendChild(lbl); li.appendChild(prg1); li.appendChild(inpt); li.appendChild(prg2);
