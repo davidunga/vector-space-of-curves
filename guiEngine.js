@@ -1,22 +1,17 @@
-var greek = {beta: "\u03B2", eps: "\u03B5", p:"\u03C6", w: "w"};
+var greek = {beta: "\u03B2", eps: "\u03B5", p:"\u03C6"};
 
 function update() {
     let canvases = document.getElementsByTagName("canvas");
     huhShapes = [];
-    let weights = [];
 
     for (let k = 1; k < canvases.length; k++) {
         let huh = makeShapeFromInput(k);
         huhShapes.push(huh);
 
-        let w = parseFloat(document.getElementById("w" + k).value);
-        weights.push(w);
-
         drawPoints("canvas" + k, huh.curvePoints(), huh.logRadius());
 
         const canvas = document.getElementById("canvas" + k);
         const ctx = canvas.getContext('2d');
-
         ctx.font = "14px Verdana";
         ctx.lineWidth = 1;
         if (checkCoPrime(huh.n, huh.m)) {
@@ -31,25 +26,18 @@ function update() {
         document.getElementById("val_n" + k).innerHTML = document.getElementById("n" + k).value;
         document.getElementById("val_eps" + k).innerHTML = document.getElementById("eps" + k).value;
         document.getElementById("val_p" + k).innerHTML = document.getElementById("p" + k).value;
-        document.getElementById("val_w" + k).innerHTML = Math.round(w * 100) + "%";
     }
 
-    let sumShape = addHuhShapesWeighted(huhShapes, weights);
-    drawPoints("canvas" + canvases.length, sumShape.curvePoints(), sumShape.logRadius());
+    let t = parseFloat(document.getElementById("mix_t").value);
+    document.getElementById("val_mix_t").innerHTML =
+        Math.round((1 - t) * 100) + "% S1 / " + Math.round(t * 100) + "% S2";
 
-    // show effective weight breakdown in mix canvas
-    const mixCanvas = document.getElementById("canvas" + canvases.length);
-    const mctx = mixCanvas.getContext('2d');
-    let totalW = weights.reduce((a, b) => a + b, 0);
-    mctx.font = "12px Verdana";
-    mctx.fillStyle = '#555';
-    let label = weights.map((w, i) => "S" + (i+1) + ": " + Math.round(100 * w / (totalW || 1)) + "%").join("   ");
-    mctx.fillText(label, 8, 18);
+    let sumShape = addHuhShapesWeighted(huhShapes, [1 - t, t]);
+    drawPoints("canvas" + canvases.length, sumShape.curvePoints(), sumShape.logRadius());
 }
 
 function addHuhShapesWeighted(shapes, weights) {
-    let total = weights.reduce((a, b) => a + b, 0);
-    if (total === 0) total = 1; // avoid divide-by-zero
+    let total = weights.reduce((a, b) => a + b, 0) || 1;
     let sumShape = shapes[0].mult(weights[0] / total);
     for (let i = 1; i < shapes.length; i++) {
         sumShape = sumShape.plus(shapes[i].mult(weights[i] / total));
@@ -89,15 +77,13 @@ function colormapBR(v) {
     let r = v ** .5;
     let g = .5 * (1 - v);
     let b = (1 - v) ** .5;
-    return 'rgb(' + Math.floor(r * 255) + ',' + Math.floor(g * 255) + ',' + Math.floor(b * 255) + ')';
+    return 'rgb(' + Math.floor(r*255) + ',' + Math.floor(g*255) + ',' + Math.floor(b*255) + ')';
 }
 
 function normalizeArray_(arr) {
     let min = Math.min.apply(null, arr);
     let scale = 1 / (Math.max.apply(null, arr) - min);
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = scale * (arr[i] - min);
-    }
+    for (let i = 0; i < arr.length; i++) arr[i] = scale * (arr[i] - min);
 }
 
 function drawPoints(canvasId, points, coloring) {
@@ -110,7 +96,7 @@ function drawPoints(canvasId, points, coloring) {
     for (let i = 0; i < points.length - 1; i++) {
         ctx.beginPath();
         ctx.moveTo(points[i].x, points[i].y);
-        ctx.lineTo(points[i + 1].x, points[i + 1].y);
+        ctx.lineTo(points[i+1].x, points[i+1].y);
         ctx.strokeStyle = colormapBR(coloring[i]);
         ctx.stroke();
     }
@@ -123,27 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function makeParamInput(param, shapeIx, min, max, step, initVal, labelTxt) {
     let inpt = document.createElement("input");
-    inpt.id = param + shapeIx + "";
+    inpt.id = param + shapeIx;
     inpt.type = "range";
-    inpt.min = min;
-    inpt.step = step;
-    inpt.value = initVal;
-    inpt.max = max;
+    inpt.min = min; inpt.step = step; inpt.value = initVal; inpt.max = max;
     inpt.oninput = update;
 
     let lbl = document.createElement("label");
-    lbl.for = inpt.id;
+    lbl.htmlFor = inpt.id;
     lbl.innerHTML = labelTxt + " (" + (param in greek ? greek[param] : param) + "):";
 
     let prg = document.createElement("p");
-    prg.innerHTML = "";
     prg.className = "val";
     prg.id = "val_" + inpt.id;
 
     let li = document.createElement("li");
-    li.appendChild(lbl);
-    li.appendChild(inpt);
-    li.appendChild(prg);
+    li.appendChild(lbl); li.appendChild(inpt); li.appendChild(prg);
     return li;
 }
 
@@ -169,22 +149,39 @@ function buildInterface() {
         prg.style.textAlign = "center";
         col.appendChild(prg);
 
-        if (k == nShapes) continue;
+        if (k < nShapes) {
+            let ul = document.createElement("ul");
+            ul.appendChild(makeParamInput("m",   shapeIx, 2,   10,  1,   INIT_SHAPE[k].m,   "Symmetry"));
+            ul.appendChild(makeParamInput("n",   shapeIx, 1,   10,  1,   INIT_SHAPE[k].n,   "Period"));
+            ul.appendChild(makeParamInput("eps", shapeIx, 0,   2,   .1,  INIT_SHAPE[k].eps, "Eccentricity"));
+            ul.appendChild(makeParamInput("p",   shapeIx, -90, 90,  1,   INIT_SHAPE[k].p,   "Phase"));
+            col.appendChild(ul);
+        } else {
+            // ── single interpolation slider under Mix canvas ────────────
+            let ul = document.createElement("ul");
 
-        let ul = document.createElement("ul");
-        ul.appendChild(makeParamInput("m",   shapeIx, 2,   10,  1,   INIT_SHAPE[k].m,   "Symmetry"));
-        ul.appendChild(makeParamInput("n",   shapeIx, 1,   10,  1,   INIT_SHAPE[k].n,   "Period"));
-        ul.appendChild(makeParamInput("eps", shapeIx, 0,   2,   .1,  INIT_SHAPE[k].eps, "Eccentricity"));
-        ul.appendChild(makeParamInput("p",   shapeIx, -90, 90,  1,   INIT_SHAPE[k].p,   "Phase"));
+            let inpt = document.createElement("input");
+            inpt.id = "mix_t";
+            inpt.type = "range";
+            inpt.min = 0; inpt.max = 1; inpt.step = 0.01; inpt.value = 0.5;
+            inpt.style.width = "270px";
+            inpt.oninput = update;
 
-        // ── weight slider ──────────────────────────────────────────────
-        let weightLi = makeParamInput("w", shapeIx, 0, 1, 0.01, 0.5, "Weight");
-        weightLi.style.borderTop = "1px dashed #bcd";
-        weightLi.style.marginTop = "6px";
-        weightLi.style.paddingTop = "6px";
-        ul.appendChild(weightLi);
-        // ───────────────────────────────────────────────────────────────
+            let lbl = document.createElement("label");
+            lbl.htmlFor = "mix_t";
+            lbl.innerHTML = "S1 \u2194 S2:";
+            lbl.style.width = "60px";
 
-        col.appendChild(ul);
+            let val = document.createElement("p");
+            val.className = "val";
+            val.id = "val_mix_t";
+            val.style.width = "120px";
+
+            let li = document.createElement("li");
+            li.appendChild(lbl); li.appendChild(inpt); li.appendChild(val);
+            ul.appendChild(li);
+            col.appendChild(ul);
+            // ────────────────────────────────────────────────────────────
+        }
     }
 }
