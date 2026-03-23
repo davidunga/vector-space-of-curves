@@ -29,7 +29,7 @@ function update() {
     }
 
     let t = parseFloat(document.getElementById("mix_t").value);
-    document.getElementById("val_mix_t2").innerHTML = Math.round(t * 100) + "%";
+    document.getElementById("val_mix_t").innerHTML = Math.round(t * 100) + "%";
 
     let sumShape = addHuhShapesWeighted(huhShapes, [1 - t, t]);
     drawPoints("canvas" + canvases.length, sumShape.curvePoints(), sumShape.logRadius());
@@ -137,12 +137,12 @@ function makeMixInput(min, max, step, initVal, labelTxt) {
     lbl.htmlFor = inpt.id;
     lbl.innerHTML = labelTxt + ":   ";
 
-    let prg1 = document.createElement("p");
-    prg1.className = "val";
-    prg1.id = "val_mix_t1";
+    let prg = document.createElement("p");
+    prg.className = "val";
+    prg.id = "val_" + inpt.id;
 
     let li = document.createElement("li");
-    li.appendChild(lbl); li.appendChild(prg1); li.appendChild(inpt); li.appendChild(prg2);
+    li.appendChild(lbl); li.appendChild(inpt); li.appendChild(prg);
     return li;
 }
 
