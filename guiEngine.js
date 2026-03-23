@@ -147,7 +147,7 @@ function makeMixInput(min, max, step, initVal, labelTxt) {
     prg.id = "val_mix_t2";
 
     let li = document.createElement("li");
-    li.appendChild(lbl); li.appendChild(prg); li.appendChild(inpt); li.appendChild(prg);
+    li.appendChild(lbl); li.appendChild(prg1); li.appendChild(inpt); li.appendChild(prg2);
     return li;
 }
 
