@@ -15,10 +15,10 @@ function update() {
         ctx.font = "14px Verdana";
         ctx.lineWidth = 1;
         if (checkCoPrime(huh.n, huh.m)) {
-            ctx.fillStyle = '#333';
+            ctx.fillStyle = '#e6edf3';
             ctx.fillText(greek.beta + "=" + Math.round(100 * huh.beta) / 100, 10, 20);
         } else {
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = '#f87171';
             ctx.fillText("m and n not co-prime", 10, 20);
         }
 
