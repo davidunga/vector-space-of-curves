@@ -1,35 +1,29 @@
 
 <div align="center">
 
-## Vector Space of Curves
+# Vector Space of Curves
 
-**A visual interface for creating and mixing a special class of parameterized curves**, described by Dongsung Huh and Terrence J. Sejnowski. Under this parameterization, a linear sum of curves yields a visually intuitive mixture, preserving geometric features of the underlying shapes.
+#### [→ Try it out.](https://davidunga.github.io/vector-space-of-curves/)
 
-[Click here to give it a go.](https://davidunga.github.io/vector-space-of-curves/)
+<img src="./doc/readme-resources/mixing.png">
 
-&nbsp;
-<img src="/doc/readme-resources/mixing.png" width="600px">
-&nbsp;
+Built on a parameterization by Huh & Sejnowski, where summing two curves yields an intuitive blend that preserves the geometric features of both.
 
 </div>
-<div align="left">
 
-### Specifically...
-The curves are parameterized as:
-<div align="center"> $logr(\theta) = \epsilon sin(\frac{m}{n} \theta - \phi)$ </div>
+### Parameterization
 
-Where:
+A curve is defined by its radius of curvature `r` as a function of the tangent angle `θ`:
 
-- r is the radius of curvature
-- &theta; is the winding angle tangent to the curve
-- m and n are co-prime integers, indexing the symmetry of the shape (m), and its periodicity relative to the winding angle (n).
-- &epsilon; and &phi; are eccentricity and phase parameters.
+```
+log r(θ) = ε · sin((m/n)·θ − φ)
+```
 
-&nbsp;
+- `m, n` — co-prime integers; `m` is the rotational symmetry of the shape, `n` its period in `θ`
+- `ε` — eccentricity (amplitude of the log-radius oscillation)
+- `φ` — phase offset
+
 ### References
 
-- Huh, D. (2015). The vector space of convex curves: How to mix shapes. arXiv preprint arXiv:1506.07515.
-
-- Huh, D., & Sejnowski, T. J. (2015). Spectrum of power laws for curved hand movements. Proceedings of the National Academy of Sciences, 112(29), E3950-E3958.
-
-</div>
+- Huh, D. (2015). *The vector space of convex curves: How to mix shapes.* arXiv:1506.07515.
+- Huh, D., & Sejnowski, T. J. (2015). *Spectrum of power laws for curved hand movements.* PNAS, 112(29), E3950–E3958.
